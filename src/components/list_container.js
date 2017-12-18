@@ -13,7 +13,7 @@ class ListContainer extends Component {
         return (
             <div>
                 <ul className='collection'>
-                    {list}
+                    {list.length ? list : <li className="collection-item center-align">Nothing To Do!</li>}
                 </ul>
             </div>
         )
