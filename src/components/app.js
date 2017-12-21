@@ -1,15 +1,18 @@
 import 'materialize-css/dist/css/materialize.min.css';
 import React, {Component} from 'react';
-import todo_data from '../todo_data';
+import axios from 'axios';
 import ListContainer from './list_container';
 import AddItem from './add_item';
+
+const BASE_URL = 'http://api.reactprototypes.com';
+const API_KEY = '?key=aliciathegreat';
 
 class App extends Component {
     constructor(props){
         super(props);
 
         this.state = {
-            todoData: todo_data
+            todoData: []
         };
 
         this.addItem = this.addItem.bind(this);
@@ -17,30 +20,45 @@ class App extends Component {
         this.toggleComplete = this.toggleComplete.bind(this);
     }
 
-    addItem(item){
-        item.complete = false;
+    componentDidMount(){
+        this.getData();
+    }
+
+    async getData(){
+        const response = await axios.get(`${BASE_URL}/todos${API_KEY}`);
+
         this.setState({
-            todoData: [item, ...this.state.todoData]
+            todoData: response.data.todos
         })
     }
 
-    toggleComplete(index){
-        const tempData = this.state.todoData.slice();
-        tempData[index].complete = !tempData[index].complete;
+    async addItem(item){
+        await axios.post(`${BASE_URL}/todos${API_KEY}`, item);
 
-        this.setState({
-            todoData: tempData
-        })
+        this.getData();
+
     }
 
-    deleteItem(index){
-        const tempData = this.state.todoData.slice();
+    // addItem(item){
+    //     item.complete = false;
+    //
+    //     axios.post(`${BASE_URL}/todos${API_KEY}`, item).then((resp)=>{
+    //        console.log('ADD RESP: ', resp);
+    //         this.getData();
+    //     });
+    //
+    // }
 
-        tempData.splice(index,1);
+    async toggleComplete(id){
+        await axios.put(`${BASE_URL}/todos/${id+API_KEY}`);
 
-        this.setState({
-            todoData: tempData
-        });
+        this.getData();
+    }
+
+    async deleteItem(id){
+        await axios.delete(`${BASE_URL}/todos/${id + API_KEY}`);
+
+        this.getData();
     }
 
     render(){
